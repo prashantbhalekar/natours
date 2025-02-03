@@ -1,13 +1,17 @@
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
-const port = 3000;
+// Middlewares
+app.use(morgan('dev')); // logger
+app.use(express.json()); // to parse json body
+app.use(express.static(`${__dirname}/public`)); // to populate static files
 
-app.get('/', (req, res) => {
-  res.status(200).send('Hello');
-});
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
-});
+module.exports = app;
