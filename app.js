@@ -7,7 +7,9 @@ const morgan = require('morgan');
 const app = express();
 
 // Middlewares
-app.use(morgan('dev')); // logger
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev')); // logger
+}
 app.use(express.json()); // to parse json body
 app.use(express.static(`${__dirname}/public`)); // to populate static files
 
