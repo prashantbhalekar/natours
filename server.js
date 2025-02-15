@@ -9,10 +9,23 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected successfully'));
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error(`Error-${err.name}: ${err.message}`);
+  console.log('Unhandled Rejection! Shutting down...');
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error(`Error-${err.name}: ${err.message}`);
+  console.log('Unhandled Rejection! Shutting down...');
+  server.close(() => {
+    process.exit(1);
+  });
 });
