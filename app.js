@@ -1,5 +1,6 @@
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const { isProduction } = require('./utils');
@@ -43,6 +44,7 @@ app.use(express.static(`${__dirname}/public`)); // to populate static files
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // Handling route not found
 app.all('*', (req, res, next) => {

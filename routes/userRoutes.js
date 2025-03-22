@@ -11,14 +11,16 @@ router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.post(
-  '/changePassword',
-  authController.protectUser,
-  authController.updatePassword
-);
+// middleware to call protectUser for all further APIs
+router.use(authController.protectUser);
 
-router.post('/updateMe', authController.protectUser, userController.updateMe);
-router.delete('/deleteMe', authController.protectUser, userController.deleteMe);
+router.get('/me', userController.getMe, userController.getUser);
+router.post('/updateMe', userController.updateMe);
+router.post('/changePassword', authController.updatePassword);
+router.delete('/deleteMe', userController.deleteMe);
+
+// middleware to call protectRoute for all further APIs
+router.use(authController.protectRoute('admin'));
 
 router
   .route('/')
