@@ -36,25 +36,48 @@ module.exports = (err, req, res, next) => {
     if (err.name === 'JsonWebTokenError') error = handleJWTError();
     if (err.name === 'TokenExpiredError') error = handleTokenExpiredError();
 
-    if (error.isOperational) {
-      res.status(error.statusCode).json({
-        status: error.status,
-        message: error.message,
-      });
-    } else {
-      console.error('ERROR', error);
+    if (req.originalUrl.startsWith('/api')) {
+      if (error.isOperational) {
+        res.status(error.statusCode).json({
+          status: error.status,
+          message: error.message,
+        });
+      } else {
+        console.error('ERROR', error);
 
-      res.status(500).json({
-        status: 'error',
-        message: 'Something Went Wrong!',
-      });
+        res.status(500).json({
+          status: 'error',
+          message: 'Something Went Wrong!',
+        });
+      }
+    } else {
+      if (error.isOperational) {
+        res.status(err.statusCode).render('error', {
+          title: 'Something went wrong!',
+          msg: err.message,
+        });
+      } else {
+        console.error('ERROR', error);
+
+        res.status(err.statusCode).render('error', {
+          title: 'Something went wrong!',
+          msg: 'Please try again latter',
+        });
+      }
     }
   } else {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-      stack: err.stack,
-      error: err,
-    });
+    if (req.originalUrl.startsWith('/api')) {
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+        stack: err.stack,
+        error: err,
+      });
+    } else {
+      res.status(err.statusCode).render('error', {
+        title: 'Something went wrong!',
+        msg: err.message,
+      });
+    }
   }
 };

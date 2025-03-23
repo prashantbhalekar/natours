@@ -41,17 +41,14 @@ reviewSchema.index(
   }
 );
 
-// reviewSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'tour',
-//     select: 'name',
-//   }).populate({
-//     path: 'user',
-//     select: ['name', 'photo'],
-//   });
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: ['name', 'photo'],
+  });
 
-//   next();
-// });
+  next();
+});
 
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
   const stats = await this.aggregate([
