@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const User = require('./../models/userModel');
-const sendEmail = require('./../utils/email');
+const Email = require('./../utils/email');
 const { isProduction } = require('./../utils');
 
 const jwt = require('jsonwebtoken');
@@ -49,6 +49,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
+  const url = `${req.protocol}://${req.get('host')}/me`;
+
+  await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 
@@ -168,13 +171,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
-
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (Valid for 10 mins)',
-      message,
+    await new Email(user, resetUrl).sendPasswordReset();
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Token sent to email!',
     });
   } catch (err) {
     user.passwordResetToken = undefined;
@@ -188,11 +190,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       )
     );
   }
-
-  res.status(201).json({
-    status: 'success',
-    message: 'Token sent to email!',
-  });
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
