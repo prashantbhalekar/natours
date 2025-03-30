@@ -6,8 +6,6 @@ const catchAsync = require('../utils/catchAsync');
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
 
-  console.log('Console from view controller');
-
   res.status(200).render('overview', {
     tour: 'All Tour',
     tours,

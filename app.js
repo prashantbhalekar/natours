@@ -17,6 +17,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const app = express();
 
@@ -47,6 +48,8 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(mongoSanitize()); // data sanitization against NoSQL query injection
 
 app.use(xss()); // data sanitization against XSS
+
+app.use(compression()); // for compression of data while sending it to client
 
 app.use(
   hpp({ whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'price'] })
