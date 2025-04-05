@@ -8,6 +8,7 @@ const bookingRouter = require('./routes/bookingRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const { isProduction } = require('./utils');
+const bookingController = require('./controllers/bookingController');
 
 const express = require('express');
 const morgan = require('morgan');
@@ -47,6 +48,12 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter); // limit each IP calls
+
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+); // kept it before json parser cause we want body in raw format rather json
 
 app.use(express.json({ limit: '1mb' })); // to parse json body
 app.use(cookieParser()); // to parse data from cookie
